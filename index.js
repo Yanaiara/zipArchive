@@ -1,14 +1,16 @@
-const AdmZip = require('adm-zip');
+const { Worker } = require("worker_threads");
 
-async function zipArchive() {
-    const zip = new AdmZip();
-    const outputFile = "test.zip";
-    zip.addLocalFolder('./test');
-    const initialDate = new Date();
-    zip.writeZip(outputFile);
-    const finishDate = new Date();
-    console.log((finishDate - initialDate).toLocaleString());
-    console.log(`Ziped archive ${outputFile} SUCESSFULLY!`);
+const count = 20;
+const initialDate = new Date();
+
+const events = (worker, initialDate) => {
+    worker.on("exit", () => {
+        const finishDate = new Date();
+        console.log((finishDate - initialDate).toLocaleString());
+    })
 }
 
-zipArchive();
+for(i=0; i < count; i++){
+    const worker = new Worker("./worker.js");
+    events(worker, initialDate);
+}
